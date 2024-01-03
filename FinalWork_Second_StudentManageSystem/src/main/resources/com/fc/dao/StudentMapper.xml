@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fc.dao.StudentMapper">
+    <!--新增学生-->
+    <insert id="insertSelective" parameterType="com.fc.entity.Student">
+        insert into student
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userid != null">
+                userID,
+            </if>
+            <if test="username != null">
+                userName,
+            </if>
+            sex,birthYear,grade,collegeID
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userid != null">
+                #{userid,jdbcType=INTEGER},
+            </if>
+            <if test="username != null">
+                #{username,jdbcType=VARCHAR},
+            </if>
+            #{sex,jdbcType=VARCHAR},#{birthyear,jdbcType=DATE},#{grade,jdbcType=DATE},#{collegeid,jdbcType=INTEGER}
+        </trim>
+    </insert>
+
+    <!--更新学生信息-->
+    <update id="updateByPrimaryKey" parameterType="com.fc.entity.Student">
+        update student
+        <set>
+            <if test="username != null">
+                userName = #{username,jdbcType=VARCHAR},
+            </if>
+            <if test="sex != null">
+                sex = #{sex,jdbcType=VARCHAR},
+            </if>
+            <if test="birthyear != null">
+                birthYear = #{birthyear,jdbcType=DATE},
+            </if>
+            <if test="grade != null">
+                grade = #{grade,jdbcType=DATE},
+            </if>
+            <if test="collegeid != null">
+                collegeID = #{collegeid,jdbcType=INTEGER}
+            </if>
+        </set>
+        <where>
+            <if test="userid != null">
+                userID = #{userid,jdbcType=INTEGER}
+            </if>
+        </where>
+    </update>
+
+    <!--删除学生-->
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from student
+        where userID = #{userid,jdbcType=INTEGER}
+    </delete>
+
+    <!--查询全部-->
+    <select id="findAll" resultType="com.fc.vo.StudentVO" parameterType="java.lang.Object">
+        select *
+        from student s
+                 inner join college c
+                            on s.collegeID = c.collegeID
+    </select>
+
+    <!--名字模糊查询-->
+    <select id="selectByExample" resultType="com.fc.vo.StudentVO" parameterType="java.lang.String">
+        select * from student s left join college c on c.collegeID = s.collegeID
+        <where>
+            <if test="findStudentByName != null and findStudentByName != ''">
+                and s.username like concat('%',#{findStudentByName},'%')
+            </if>
+        </where>
+    </select>
+
+    <!--根据id查询学生-->
+    <select id="getById" resultType="com.fc.entity.Student" parameterType="java.lang.Integer">
+        select *
+        from student
+        where userID = #{userid}
+    </select>
+</mapper>
